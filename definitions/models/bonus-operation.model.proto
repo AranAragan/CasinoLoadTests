@@ -1,0 +1,35 @@
+syntax="proto3";
+
+package bonusApp.models;
+import "google/protobuf/timestamp.proto";
+
+enum BonusOperationType {
+  BONUS_OPERATION_TYPE_UNKNOWN = 0;   // Неизвестный тип операции
+  BONUS_OPERATION_TYPE_INIT = 1;      // Эта операция проводится при открытии бонусного счёта
+  BONUS_OPERATION_TYPE_BURN = 2;      // Эта операция обозначает сгорание бонусов (смотри burnReason)
+  BONUS_OPERATION_TYPE_WITHDRAW = 3;  // Эта операция проводится при выводе бонусов на реальный счёт
+  BONUS_OPERATION_TYPE_CLOSE = 4;     // Эта операция проводится при закрытии счёта
+}
+
+enum BonusOperationStatus {
+  BONUS_OPERATION_STATUS_UNKNOWN = 0;   // Неизвестный статус операции
+  BONUS_OPERATION_STATUS_CREATED = 1;   // Операция создана, но не подтверждена
+  BONUS_OPERATION_STATUS_CANCELED = 2;  // Операция отменена из-за ошибки (смотри cancelReason)
+  BONUS_OPERATION_STATUS_SUCCESS = 3;   // Операция успешно проведена
+}
+
+message BonusOperation {
+  string id = 1;
+  google.protobuf.Timestamp createdAt = 2;
+  google.protobuf.Timestamp updatedAt = 3;
+  string accountId = 4;
+  string clientId = 5;
+  string currency = 6;
+  string amount = 7;
+  BonusOperationType type = 8;
+  BonusOperationStatus status = 9;
+
+  optional string burnReason = 10;
+  optional string withdrawTarget = 11;
+  optional string cancelReason = 12;
+}

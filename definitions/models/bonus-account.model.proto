@@ -1,0 +1,37 @@
+syntax="proto3";
+
+package bonusApp.models;
+import "google/protobuf/timestamp.proto";
+
+enum BonusAccountReferenceType {
+  BONUS_ACCOUNT_REFERENCE_TYPE_UNKNOWN = 0;
+  BONUS_ACCOUNT_REFERENCE_TYPE_OFFER = 1; // Данный тип используется в системе офферов
+}
+
+enum BonusAccountStatus {
+  BONUS_ACCOUNT_STATUS_UNKNOWN = 0;
+  BONUS_ACCOUNT_STATUS_OPEN = 1; // Устанавливается для открытых счетов
+  BONUS_ACCOUNT_STATUS_CLOSE = 2; // Устанавливается для закрытых счетов
+}
+
+message BonusAccount {
+  string id = 1;
+  BonusAccountStatus status = 2;
+  google.protobuf.Timestamp openedAt = 3;
+  google.protobuf.Timestamp updatedAt = 4;
+  optional google.protobuf.Timestamp closedAt = 5;
+  /// Указывает на тип во внешней системе
+  BonusAccountReferenceType referenceType = 6;
+  /// Указывает на ID аггрегата или произвольный ключ во внешней системе
+  string referenceId = 7;
+  /// Ссылка на клиента
+  string clientId  = 8;
+  string currency  = 9;
+  int32 currencyUnit = 10;
+  /// Начальное значение при открытии счёта
+  string startAmount = 11;
+  /// Текущее значение
+  string currentAmount= 12;
+  /// Максимальная сумма вывода
+  string amountWithdrawMax = 13;
+}

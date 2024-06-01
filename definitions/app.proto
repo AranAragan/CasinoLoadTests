@@ -1,0 +1,110 @@
+syntax = "proto3";
+
+package bonusApp;
+import "models/bonus-account.model.proto";
+import "models/bonus-operation.model.proto";
+
+/************************************
+ * Common
+ ************************************/
+message StatusResponse {
+  bool status = 1;
+}
+
+message IdBonusAccountRequest {
+  string clientId = 1;
+  /// Указывает на тип во внешней системе
+  bonusApp.models.BonusAccountReferenceType referenceType = 2;
+  /// Указывает на ID аггрегата или произвольный ключ во внешней системе
+  string referenceId = 3;
+}
+
+/************************************
+ * BonusAccountService
+ ************************************/
+service BonusAccountService {
+  rpc open(OpenBonusAccountRequest) returns (bonusApp.models.BonusAccount);
+  rpc info(InfoBonusAccountFilter) returns (bonusApp.models.BonusAccount);
+  rpc close(CloseBonusAccountRequest) returns (StatusResponse);
+  rpc totalBalance(TotalBalanceAccountRequest) returns (TotalBalanceAccountResponse);
+}
+
+message OpenBonusAccountRequest {
+  IdBonusAccountRequest id = 1;
+  string currency  = 4;
+  /// Начальное значение при открытии счёта
+  string amount = 5;
+  /// Максимальная сумма вывода
+  string withdrawMax = 6;
+}
+
+message InfoBonusAccountFilter {
+  IdBonusAccountRequest id = 1;
+}
+
+message CloseBonusAccountRequest {
+  IdBonusAccountRequest id = 1;
+}
+
+message TotalBalanceAccountRequest {
+  /// ID клиента
+  string clientId = 1;
+  /// Указывает на тип во внешней системе
+  bonusApp.models.BonusAccountReferenceType referenceType = 2;
+}
+
+message TotalBalanceAccountResponse {
+  /// Список балансов по валютам
+  repeated TotalBalanceAccountResponseItem items = 1;
+}
+
+message TotalBalanceAccountResponseItem {
+  /// ID клиента
+  string clientId = 1;
+  /// Указывает на тип во внешней системе
+  bonusApp.models.BonusAccountReferenceType referenceType = 2;
+  /// Валюта
+  string currency = 3;
+  /// Баланс
+  string total = 4;
+}
+
+/************************************
+ * BonusTransferService
+ ************************************/
+message AmountResponse {
+  string amount = 1;
+}
+
+service BonusTransferService {
+  /// Начинает операцию по переводу всех бонусов на реальный счёт;
+  rpc start(StartTransferBonusRequest) returns (AmountResponse);
+
+  /// Возвращает текущее состояние операции по переводу всех бонусов на реальный счёт;
+  rpc status(StatusTransferBonusFilter) returns (bonusApp.models.BonusOperation);
+
+  /// Завершает успешно операцию по переводу всех бонусов на реальный счёт;
+  rpc success(SuccessTransferBonusRequest) returns (StatusResponse);
+
+  /// Завершает с ошибкой операцию по переводу всех бонусов на реальный счёт;
+  rpc cancel(CancelTransferBonusRequest) returns (StatusResponse);
+}
+
+message StartTransferBonusRequest {
+  IdBonusAccountRequest id = 1;
+  /// Указывает на ID цели куда делаем перевод
+  string withdrawTarget = 2;
+}
+
+message StatusTransferBonusFilter {
+  IdBonusAccountRequest id = 1;
+}
+
+message SuccessTransferBonusRequest {
+  IdBonusAccountRequest id = 1;
+}
+
+message CancelTransferBonusRequest {
+  IdBonusAccountRequest id = 1;
+  string reason = 2;
+}
